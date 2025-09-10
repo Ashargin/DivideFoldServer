@@ -89,27 +89,19 @@ def results_page(token):
 
     # Parse frags back to list
     frags = []
+    frag_lens = []
     for this_frag_str in frags_str[3:-3].split("]], [["):
         this_frag = []
+        frag_lens.append(0)
         for subfrag_str in this_frag_str.split("], ["):
             start, end = subfrag_str.split(", ")
-            this_frag.append([int(start), int(end)])
+            this_frag.append((int(start), int(end)))
+            frag_lens[-1] += int(end) - int(start) + 1
         frags.append(this_frag)
 
-    # Write prediction
-    st.markdown("### 🧬 Predicted secondary structure")
-    st.code(f"{seq}\n{pred}", language="text")
-
-    # Write fragments
-    st.markdown("### 🧬 Predicted fragments")
-    st.code(frags, language="text")
-
-    # Plot structure
-    plot_structure(seq, pred, frags)
-
-
-def plot_structure(seq, pred, frags):
-    st.markdown("### Visualization")
+    # Reorder fragments
+    frag_order = np.argsort(frag_lens)[::-1]
+    frags = [frags[i] for i in frag_order]
 
     # Sample colors
     def sample_color():
@@ -127,21 +119,71 @@ def plot_structure(seq, pred, frags):
     hexadecimal_converter = "#%02x%02x%02x"
     colors = [hexadecimal_converter % c for c in colors]
 
-    # Reorder and index fragments
+    # Write prediction
+    write_prediction(seq, pred, frags, colors)
+
+    # Write fragments
+    write_fragments(frags, colors)
+
+    # Plot structure
+    plot_structure(seq, pred, frags, colors)
+
+
+def write_colored_text(texts, colors, with_comma=False):
+    if with_comma:
+        formatted_texts = [[] for _ in range(len(texts))]
+        formatted_colors = []
+        for i in range(len(colors)):
+            formatted_colors.append(colors[i])
+            if i < len(colors) - 1:
+                formatted_colors.append("#000000")
+            for j in range(len(texts)):
+                formatted_texts[j].append(texts[j][i])
+                if i < len(colors) - 1:
+                    formatted_texts[j].append(", ")
+        texts = formatted_texts
+        colors = formatted_colors
+
+    html_blocks = [[f'<span style="color:{c};">{t}</span>' for t, c in zip(row_texts, colors)] for row_texts in texts]
+    row_sep = "\n" + " " * 4
+    html_color_text = row_sep.join(["".join(row_hb) for row_hb in html_blocks])
+    st.markdown(f"""
+    <div style="
+        background-color: #f0f0f0;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: monospace;
+        white-space: pre;       /* Prevent wrapping */
+        overflow-x: auto;       /* Horizontal scroll */
+        overflow-y: hidden;     /* Prevent vertical scroll */
+    ">{html_color_text}</div>
+    """, unsafe_allow_html=True)
+
+
+def write_prediction(seq, pred, frags, colors):
+    st.markdown("### 🧬 Predicted secondary structure")
+    subfrag_colors = [(subf, c) for f, c in zip(frags, colors) for subf in f]
+    subfrag_colors = sorted(subfrag_colors, key=lambda x: x[0][0])
+    subfrags, subcolors = zip(*subfrag_colors)
+    subtxts = [[txt[subf[0] - 1:subf[1] - 1] for subf in subfrags] for txt in [seq, pred]]
+    write_colored_text(subtxts, subcolors)
+
+def write_fragments(frags, colors):
+    st.markdown("### ✂️ Predicted fragments")
+    write_colored_text([frags], colors, with_comma=True)
+
+def plot_structure(seq, pred, frags, colors):
+    st.markdown("### 🔎 Visualization")
+
+    # Index fragments
     frag_idx = {}
-    frag_lens = []
     for k, f in enumerate(frags):
-        frag_lens.append(0)
         for start, end in f:
-            frag_lens[-1] += end - start + 1
             for i in range(start, end + 1):
                 frag_idx[i] = k
-    frag_order = np.argsort(frag_lens)[::-1]
-    frag_rank = np.argsort(frag_order)
 
     # Build color string for Forna
-    colors_str = " ".join([f"{i}:{colors[frag_rank[frag_idx[i]]]}" \
-                                    for i in range(1, len(seq) + 1)])
+    colors_str = " ".join([f"{i}:{colors[frag_idx[i]]}" for i in range(1, len(seq) + 1)])
 
     # Forna
     forna_component(structure = pred, # RNA structure
