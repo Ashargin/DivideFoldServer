@@ -1,8 +1,8 @@
-# DivideFoldServer
-
-Web server for DivideFold
+\# DivideFoldServer
 
 
 
-!\[alt text](resources/example.png "Title")
+This is a web server for \[DivideFold](https://github.com/Ashargin/DivideFold).
+
+!\[Example](resources/example.png)
 
