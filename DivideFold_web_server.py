@@ -20,7 +20,7 @@ EXAMPLE_SEQUENCE = "UUGAUGGAGAGUUUGAUCCUGGCUCAGGACGAACGCUGGCGGCGUGCUUAACACAUGCAA
 token = st.query_params.get("token", None)
 if token is None:
     st.warning("No token provided. Please access this app through a proper job link.")
-    # st.stop()
+    st.stop()
 
 with st.spinner("Loading libraries..."):
     from dividefold.predict import dividefold_predict, knotfold_predict, ipknot_predict, probknot_predict, pkiss_predict, rnafold_predict, linearfold_predict, mxfold2_predict
