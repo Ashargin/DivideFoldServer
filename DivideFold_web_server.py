@@ -28,6 +28,21 @@ with st.spinner("Loading libraries..."):
 
 
 def main_page():
+    # Widget style
+    st.markdown(
+        """
+        <style>
+        /* Target all text_input labels */
+        label[data-testid="stWidgetLabel"] > div {
+            font-size: 16px !important;  /* Bigger font size */
+            font-weight: bold;           /* Optional: bold */
+            color: #333333;              /* Optional: custom color */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     # Set example sequence
     if st.session_state.get("use_example_clicked"):
         st.session_state.rna_sequence = EXAMPLE_SEQUENCE
@@ -44,41 +59,45 @@ def main_page():
     left, right = st.columns(2)
 
     # Maximum fragment length
-    max_fragment_length = left.text_input("Maximum fragment length (nt):", value=1000, placeholder="e.g., 1000", key="max_fragment_length", help="The maximum length allowed for the fragments, in nucleotides.\nShould be between 50 and 1,000.")
+    max_fragment_length = left.number_input("Maximum fragment length (nt):", min_value=50, max_value=1000, step=1, value=1000, placeholder="e.g., 1000", key="max_fragment_length", help="The maximum length allowed for the fragments, in nucleotides.\nShould be between 50 and 1,000.")
 
     # Second parameter
-    predict_fnc = right.selectbox("Structure prediction model:", options=["KnotFold", "IPknot", "ProbKnot", "pKiss", "RNAfold", "LinearFold", "MXfold2"], index=0, key="predict_fnc", help="The secondary structure prediction model used on the fragments.")
+    predict_fnc_selectbox = right.selectbox("Structure prediction model:", options=["KnotFold", "IPknot", "ProbKnot", "pKiss", "RNAfold", "LinearFold", "MXfold2"], index=0, key="predict_fnc", help="The secondary structure prediction model used on the fragments.")
 
     # Submit button
     if st.button("Predict"):
         # Prepare parameters
+        seq = st.session_state.get("rna_sequence")
         predict_fnc = {"KnotFold": knotfold_predict,
                     "IPknot": ipknot_predict,
                     "ProbKnot": probknot_predict,
                     "pKiss": pkiss_predict,
                     "RNAfold": rnafold_predict,
                     "LinearFold": linearfold_predict,
-                    "MXfold2": mxfold2_predict}[predict_fnc]
-        max_fragment_length = int(max_fragment_length)
+                    "MXfold2": mxfold2_predict}[predict_fnc_selectbox]
 
-        # Loading screen spinner
-        with st.spinner("Running DivideFold..."):
-            seq = st.session_state.get("rna_sequence")
-            pred, frags = dividefold_predict(seq,
-                                             predict_fnc=predict_fnc,
-                                             max_fragment_length=max_fragment_length,
-                                             return_fragments=True)
+        # Validate inputs
+        if len(seq) <= max_fragment_length:
+            st.error("The RNA sequence must be longer than the maximum fragment length.")
+        else:
 
-            # Write results
-            if not os.path.exists("results"):
-                os.mkdir("results")
-            results_path = f"results/{token}.txt"
-            with open(results_path, "w") as f:
-                f.write(f"{seq}\n{pred}\n{[f.tolist() for f in frags]}\n")
+            # Loading screen spinner
+            with st.spinner("Running DivideFold..."):
+                pred, frags = dividefold_predict(seq,
+                                                predict_fnc=predict_fnc,
+                                                max_fragment_length=max_fragment_length,
+                                                return_fragments=True)
 
-        # Show results
-        st.success("Prediction complete!")
-        results_page(token)
+                # Write results
+                if not os.path.exists("results"):
+                    os.mkdir("results")
+                results_path = f"results/{token}.txt"
+                with open(results_path, "w") as f:
+                    f.write(f"{seq}\n{pred}\n{[f.tolist() for f in frags]}\n")
+
+            # Show results
+            st.success("Prediction complete!")
+            results_page(token)
 
 
 def results_page(token):
