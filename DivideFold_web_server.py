@@ -62,14 +62,14 @@ def main_page():
     max_fragment_length = left.number_input("Maximum fragment length (nt):", min_value=50, max_value=1000, step=1, value=1000, placeholder="e.g., 1000", key="max_fragment_length", help="The maximum length allowed for the fragments, in nucleotides.\nShould be between 50 and 1,000.")
 
     # Second parameter
-    predict_fnc_selectbox = right.selectbox("Structure prediction model:", options=["KnotFold", "IPknot", "ProbKnot", "pKiss", "RNAfold", "LinearFold", "MXfold2"], index=0, key="predict_fnc", help="The secondary structure prediction model used on the fragments.")
+    predict_fnc_selectbox = right.selectbox("Structure prediction model:", options=["KnotFold (best accuracy, slower)", "IPknot (good accuracy, faster)", "LinearFold", "RNAfold", "MXfold2", "ProbKnot", "pKiss"], index=0, key="predict_fnc", help="The secondary structure prediction model used on the fragments. We recommend KnotFold for higher accuracy or IPknot for faster prediction.")
 
     # Submit button
     if st.button("Predict"):
         # Prepare parameters
         seq = st.session_state.get("rna_sequence")
-        predict_fnc = {"KnotFold": knotfold_predict,
-                    "IPknot": ipknot_predict,
+        predict_fnc = {"KnotFold (best accuracy, slower)": knotfold_predict,
+                    "IPknot (good accuracy, faster)": ipknot_predict,
                     "ProbKnot": probknot_predict,
                     "pKiss": pkiss_predict,
                     "RNAfold": rnafold_predict,
