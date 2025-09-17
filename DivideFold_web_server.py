@@ -77,7 +77,9 @@ def main_page():
                     "MXfold2": mxfold2_predict}[predict_fnc_selectbox]
 
         # Validate inputs
-        if len(seq) <= max_fragment_length:
+        if not seq:
+            st.error("Please input an RNA sequence.")
+        elif len(seq) <= max_fragment_length:
             st.error("The RNA sequence must be longer than the maximum fragment length.")
         else:
 
