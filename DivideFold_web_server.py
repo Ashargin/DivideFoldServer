@@ -28,20 +28,8 @@ with st.spinner("Loading libraries..."):
 
 
 def main_page():
-    # Widget style
-    st.markdown(
-        """
-        <style>
-        /* Target all text_input labels */
-        label[data-testid="stWidgetLabel"] > div {
-            font-size: 16px !important;  /* Bigger font size */
-            font-weight: bold;           /* Optional: bold */
-            color: #333333;              /* Optional: custom color */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+    # Settings
+    parameter_font_size = 18
 
     # Set example sequence
     if st.session_state.get("use_example_clicked"):
@@ -49,7 +37,8 @@ def main_page():
         st.session_state.use_example_clicked = False
 
     # Sequence input
-    sequence_input = st.text_area("RNA sequence:", value="", height=200, key="rna_sequence")
+    st.markdown(f'<h3 style="margin-bottom:-100px; font-size:{parameter_font_size}px;">RNA sequence:</h3>', unsafe_allow_html=True)
+    sequence_input = st.text_area("", value="", height=200, key="rna_sequence")
 
     # Button to set example sequence
     if st.button("Use example sequence"):
@@ -59,10 +48,12 @@ def main_page():
     left, right = st.columns(2)
 
     # Maximum fragment length
-    max_fragment_length = left.number_input("Maximum fragment length (nt):", min_value=50, max_value=1000, step=1, value=1000, placeholder="e.g., 1000", key="max_fragment_length", help="The maximum length allowed for the fragments, in nucleotides.\nShould be between 50 and 1,000.")
+    left.markdown(f'<h3 style="margin-bottom:-100px; font-size:{parameter_font_size}px;">Maximum fragment length (nt):</h3>', unsafe_allow_html=True)
+    max_fragment_length = left.number_input("", min_value=50, max_value=1000, step=1, value=1000, placeholder="e.g., 1000", key="max_fragment_length", help="The maximum length allowed for the fragments, in nucleotides.\nShould be between 50 and 1,000.")
 
     # Second parameter
-    predict_fnc_selectbox = right.selectbox("Structure prediction model:", options=["KnotFold (best accuracy, slower)", "IPknot (good accuracy, faster)", "LinearFold", "RNAfold", "MXfold2", "ProbKnot"], index=0, key="predict_fnc", help="The secondary structure prediction model used on the fragments. We recommend KnotFold for higher accuracy or IPknot for faster prediction.")
+    right.markdown(f'<h3 style="margin-bottom:-100px; font-size:{parameter_font_size}px;">Structure prediction model:</h3>', unsafe_allow_html=True)
+    predict_fnc_selectbox = right.selectbox("", options=["KnotFold (best accuracy, slower)", "IPknot (good accuracy, faster)", "LinearFold", "RNAfold", "MXfold2", "ProbKnot"], index=0, key="predict_fnc", help="The secondary structure prediction model used on the fragments. We recommend KnotFold for higher accuracy or IPknot for faster prediction.")
 
     # Submit button
     if st.button("Predict"):
