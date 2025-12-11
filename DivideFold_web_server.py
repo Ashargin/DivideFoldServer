@@ -141,7 +141,7 @@ def results_page(token):
     plot_structure(seq, pred, frags, colors)
 
 
-def write_colored_text(texts, colors, with_comma=False):
+def write_colored_text(texts, colors, with_comma=False, break_all=False):
     if with_comma:
         formatted_texts = [[] for _ in range(len(texts))]
         formatted_colors = []
@@ -156,7 +156,8 @@ def write_colored_text(texts, colors, with_comma=False):
         texts = formatted_texts
         colors = formatted_colors
 
-    html_blocks = [[f'<span style="color:{c};">{t}</span>' for t, c in zip(row_texts, colors)] for row_texts in texts]
+    styling = f'overflow-wrap:{"anywhere" if break_all else "normal"}; word-break:{"break-word" if break_all else "normal"}; line-break:{"anywhere" if break_all else "normal"};'
+    html_blocks = [[f'<span style="color:{c}; {styling}">{t}</span>' for t, c in zip(row_texts, colors)] for row_texts in texts]
     row_sep = "\n" + " " * 4
     html_color_text = row_sep.join(["".join(row_hb) for row_hb in html_blocks])
     st.markdown(f"""
@@ -165,7 +166,7 @@ def write_colored_text(texts, colors, with_comma=False):
         padding: 15px;
         border-radius: 5px;
         font-family: monospace;
-        white-space: pre;       /* Prevent wrapping */
+        white-space: pre-wrap;       /* Allow wrapping */
         overflow-x: auto;       /* Horizontal scroll */
         overflow-y: hidden;     /* Prevent vertical scroll */
     ">{html_color_text}</div>
@@ -178,7 +179,7 @@ def write_prediction(seq, pred, frags, colors):
     subfrag_colors = sorted(subfrag_colors, key=lambda x: x[0][0])
     subfrags, subcolors = zip(*subfrag_colors)
     subtxts = [[txt[subf[0] - 1:subf[1] - 1] for subf in subfrags] for txt in [seq, pred]]
-    write_colored_text(subtxts, subcolors)
+    write_colored_text(subtxts, subcolors, break_all=True)
 
 def write_fragments(frags, colors):
     st.markdown("### ✂️ Predicted fragments")
