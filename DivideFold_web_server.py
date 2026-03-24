@@ -84,6 +84,13 @@ def main_page():
             st.error("The RNA sequence must be longer than the maximum fragment length.")
         else:
 
+            if "T" in seq:
+                if "U" in seq:
+                    st.warning("The input sequence contains both U and T nucleotides, make sure it is correct.")
+                else:
+                    seq = seq.replace("T", "U")
+                    st.warning("Found T in the input sequence and converted to U.")
+
             # Loading screen spinner
             with st.spinner("Running DivideFold+..."):
                 pred, frags = dividefold_predict(seq,
