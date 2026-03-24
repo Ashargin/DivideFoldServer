@@ -29,6 +29,7 @@ token = st.session_state["token"]
 
 with st.spinner("Loading libraries..."):
     from dividefold.predict import dividefold_predict, knotfold_predict, ipknot_predict, probknot_predict, rnafold_predict, linearfold_predict, mxfold2_predict
+    from dividefold.utils import eval_energy
 
 
 def main_page():
@@ -89,13 +90,14 @@ def main_page():
                                                 predict_fnc=predict_fnc,
                                                 max_fragment_length=max_fragment_length,
                                                 return_fragments=True)
+                energy = eval_energy(seq, pred)
 
                 # Write results
                 if not os.path.exists("results"):
                     os.mkdir("results")
                 results_path = f"results/{token}.txt"
                 with open(results_path, "w") as f:
-                    f.write(f"{seq}\n{pred}\n{[f.tolist() for f in frags]}\n")
+                    f.write(f"{seq}\n{pred}\n{[f.tolist() for f in frags]}\n{energy}\n")
 
             # Show results
             st.success("Prediction complete!")
@@ -107,7 +109,8 @@ def results_page(token):
     results_path = f"results/{token}.txt"
     with open(results_path, "r") as f:
         results_data = f.read()
-    seq, pred, frags_str = results_data.strip().split("\n")
+    seq, pred, frags_str, energy = results_data.strip().split("\n")
+    energy = float(energy)
 
     # Parse frags back to list
     frags = []
@@ -142,7 +145,7 @@ def results_page(token):
     colors = [hexadecimal_converter % c for c in colors]
 
     # Write prediction
-    write_prediction(seq, pred, frags, colors)
+    write_prediction(seq, pred, frags, colors, energy)
 
     # Write fragments
     write_fragments(frags, colors)
@@ -183,13 +186,14 @@ def write_colored_text(texts, colors, with_comma=False, break_all=False):
     """, unsafe_allow_html=True)
 
 
-def write_prediction(seq, pred, frags, colors):
+def write_prediction(seq, pred, frags, colors, energy):
     st.markdown("### 🧬 Predicted secondary structure")
     subfrag_colors = [(subf, c) for f, c in zip(frags, colors) for subf in f]
     subfrag_colors = sorted(subfrag_colors, key=lambda x: x[0][0])
     subfrags, subcolors = zip(*subfrag_colors)
     subtxts = [[txt[subf[0] - 1:subf[1] - 1] for subf in subfrags] for txt in [seq, pred]]
     write_colored_text(subtxts, subcolors, break_all=True)
+    st.markdown(f"##### Structure energy: {energy:.1f}")
 
 def write_fragments(frags, colors):
     st.markdown("### ✂️ Predicted fragments")
