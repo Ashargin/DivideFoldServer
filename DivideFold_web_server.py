@@ -215,7 +215,9 @@ def write_prediction(seq, pred, frags, colors, energy):
     subfrag_colors = [(subf, c) for f, c in zip(frags, colors) for subf in f]
     subfrag_colors = sorted(subfrag_colors, key=lambda x: x[0][0])
     subfrags, subcolors = zip(*subfrag_colors)
-    subtxts = [[txt[subf[0] - 1:subf[1] - 1] for subf in subfrags] for txt in [seq, pred]]
+    subtxts = [[txt[subf[0] - 1:subf[1]] for subf in subfrags] for txt in [seq, pred]]
+    for x in subtxts:
+        print(x)
     write_colored_text(subtxts, subcolors, break_all=True)
     st.markdown(f"##### Structure free energy: {energy:.1f}")
 
