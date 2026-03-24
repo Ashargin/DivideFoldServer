@@ -103,7 +103,7 @@ def main_page():
                                                 predict_fnc=predict_fnc,
                                                 max_fragment_length=max_fragment_length,
                                                 return_fragments=True)
-                energy = eval_energy(seq, re.sub(r"[^\(\)\[\]\.]", ".", ".", pred))
+                energy = eval_energy(seq, re.sub(r"[^\(\)\[\]\.]", ".", pred))
 
                 # Write results
                 if not os.path.exists("results"):
