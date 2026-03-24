@@ -90,6 +90,9 @@ def main_page():
                 else:
                     seq = seq.replace("T", "U")
                     st.warning("Found T in the input sequence and converted to U.")
+            if "\n" in seq:
+                seq = seq.replace("\n", "")
+                st.warning("Found several lines in the input sequence and joined to a single line. If you intend to give several sequences at once, this web server does not support it, use DivideFold+ locally instead.")
 
             # Loading screen spinner
             with st.spinner("Running DivideFold+..."):
