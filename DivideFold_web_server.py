@@ -66,7 +66,7 @@ def main_page():
     # Second parameter
     right.markdown(f'<h3 style="margin-bottom:-30px; font-size:{parameter_font_size}px;">Structure prediction model:</h3>', unsafe_allow_html=True)
     right.caption("The secondary structure prediction model used on the fragments.")
-    predict_fnc_selectbox = right.selectbox("", options=["KnotFold (best accuracy, slower)", "IPknot (good accuracy, faster)", "LinearFold", "RNAfold", "MXfold2", "ProbKnot"], index=0, key="predict_fnc", label_visibility="collapsed")
+    predict_fnc_selectbox = right.selectbox("", options=["IPknot (good accuracy, faster)", "KnotFold (best accuracy, slower)", "LinearFold", "RNAfold", "MXfold2", "ProbKnot"], index=0, key="predict_fnc", label_visibility="collapsed")
 
     # Submit button
     if st.button("Predict"):
@@ -102,7 +102,7 @@ def main_page():
                                                 predict_fnc=predict_fnc,
                                                 max_fragment_length=max_fragment_length,
                                                 return_fragments=True)
-                energy = eval_energy(seq, pred)
+                energy = eval_energy(seq, re.sub(r"[^\(\)\[\]\.]", ".", ".", pred))
 
                 # Write results
                 if not os.path.exists("results"):
