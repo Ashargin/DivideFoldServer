@@ -59,17 +59,19 @@ def main_page():
     left, right = st.columns(2)
 
     # Maximum fragment length
-    left.markdown(f'<h3 style="margin-bottom:-100px; font-size:{parameter_font_size}px;">Maximum fragment length (nt):</h3>', unsafe_allow_html=True)
-    max_fragment_length = left.number_input("", min_value=50, max_value=1000, step=1, value=1000, placeholder="e.g., 1000", key="max_fragment_length", help="The maximum length allowed for the fragments, in nucleotides.\nShould be between 50 and 1,000.")
+    left.markdown(f'<h3 style="margin-bottom:-30px; font-size:{parameter_font_size}px;">Maximum fragment length (nt):</h3>', unsafe_allow_html=True)
+    left.caption("The maximum length allowed for the fragments, in nucleotides.\nShould be between 50 and 1,000.\n")
+    max_fragment_length = left.number_input("", min_value=50, max_value=1000, step=1, value=1000, placeholder="e.g., 1000", key="max_fragment_length", label_visibility="collapsed")
 
     # Second parameter
-    right.markdown(f'<h3 style="margin-bottom:-100px; font-size:{parameter_font_size}px;">Structure prediction model:</h3>', unsafe_allow_html=True)
-    predict_fnc_selectbox = right.selectbox("", options=["KnotFold (best accuracy, slower)", "IPknot (good accuracy, faster)", "LinearFold", "RNAfold", "MXfold2", "ProbKnot"], index=0, key="predict_fnc", help="The secondary structure prediction model used on the fragments. We recommend KnotFold for higher accuracy or IPknot for faster prediction.")
+    right.markdown(f'<h3 style="margin-bottom:-30px; font-size:{parameter_font_size}px;">Structure prediction model:</h3>', unsafe_allow_html=True)
+    right.caption("The secondary structure prediction model used on the fragments.")
+    predict_fnc_selectbox = right.selectbox("", options=["KnotFold (best accuracy, slower)", "IPknot (good accuracy, faster)", "LinearFold", "RNAfold", "MXfold2", "ProbKnot"], index=0, key="predict_fnc", label_visibility="collapsed")
 
     # Submit button
     if st.button("Predict"):
         # Prepare parameters
-        seq = st.session_state.get("rna_sequence")
+        seq = st.session_state.get("rna_sequence").upper().strip()
         predict_fnc = {"KnotFold (best accuracy, slower)": knotfold_predict,
                     "IPknot (good accuracy, faster)": ipknot_predict,
                     "ProbKnot": probknot_predict,
