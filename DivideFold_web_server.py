@@ -115,6 +115,17 @@ def main_page():
             st.success("Prediction complete!")
             results_page(token)
 
+    # References
+    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+    st.markdown(f'<h3 style="margin-bottom:-32px; font-size:{parameter_font_size}px;">References:</h3>', unsafe_allow_html=True)
+    st.markdown("""
+        Loïc Omnes, Eric Angel, Pierre Bartet, François Radvanyi, and Fariza Tahi: A divide-and-conquer approach based on deep learning for long RNA secondary structure prediction: focus on pseudoknots identification, _PLOS ONE_ 20 (4) (2025) e0314837. doi:[10.1371/journal.pone.0314837](https://doi.org/10.1371/journal.pone.0314837).
+    """)  # - second item... later
+
+    # Availability
+    st.markdown(f'<h3 style="margin-bottom:-32px; font-size:{parameter_font_size}px;">Availability:</h3>', unsafe_allow_html=True)
+    st.markdown("DivideFold+ is available on [EvryRNA](https://evryrna.ibisc.univ-evry.fr/evryrna/dividefold/home) and [GitHub](https://github.com/Ashargin/DivideFold) with its source code.")
+
 
 def results_page(token):
     # Read results
