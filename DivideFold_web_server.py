@@ -195,7 +195,7 @@ def write_colored_text(texts, colors, with_comma=False, break_all=False):
         colors = formatted_colors
 
     styling = f'overflow-wrap:{"anywhere" if break_all else "normal"}; word-break:{"break-word" if break_all else "normal"}; line-break:{"anywhere" if break_all else "normal"};'
-    html_blocks = [[f'<span style="color:{c}; {styling}">{html.escape(t)}</span>' for t, c in zip(row_texts, colors)] for row_texts in texts]
+    html_blocks = [[f'<span style="color:{c}; {styling}">{html.escape(str(t))}</span>' for t, c in zip(row_texts, colors)] for row_texts in texts]
     row_sep = "\n" + " " * 4
     html_color_text = row_sep.join(["".join(row_hb) for row_hb in html_blocks])
     st.markdown(f"""
